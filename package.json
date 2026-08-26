@@ -1,0 +1,16 @@
+{
+  "name": "swiftreply-ai-mvp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A secure, deployable MVP for AI-assisted customer replies",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "dev": "NODE_ENV=development node --watch src/server.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT"
+}

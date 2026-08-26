@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Create clear, professional replies with AI." />
+    <title>SwiftReply AI</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="eyebrow"><span></span> AI reply assistant</div>
+        <h1 id="page-title">Turn difficult messages into clear replies.</h1>
+        <p class="intro">Paste a message, choose the tone, and get a polished response you can review and send.</p>
+      </section>
+
+      <section class="workspace" aria-label="Reply generator">
+        <form id="reply-form" class="composer">
+          <div class="field password-field">
+            <label for="password">App password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter deployment password" required />
+            <small>Your OpenAI API key stays securely on the server.</small>
+          </div>
+
+          <div class="field">
+            <div class="field-heading">
+              <label for="message">Message to answer</label>
+              <span id="character-count">0 / 4000</span>
+            </div>
+            <textarea id="message" name="message" maxlength="4000" rows="10" placeholder="Example: Hi, I wanted to follow up because the document is still pending..." required></textarea>
+          </div>
+
+          <div class="controls">
+            <div class="field tone-field">
+              <label for="tone">Tone</label>
+              <select id="tone" name="tone">
+                <option value="professional">Professional</option>
+                <option value="friendly">Friendly</option>
+                <option value="concise">Concise</option>
+                <option value="empathetic">Empathetic</option>
+              </select>
+            </div>
+            <button id="generate-button" type="submit">
+              <span class="button-label">Generate reply</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+        </form>
+
+        <article class="result-panel" aria-live="polite">
+          <div class="result-heading">
+            <div>
+              <p class="result-label">Suggested reply</p>
+              <p id="status" class="status">Ready when you are.</p>
+            </div>
+            <button id="copy-button" class="secondary-button" type="button" disabled>Copy</button>
+          </div>
+          <div id="result" class="result empty">Your generated reply will appear here.</div>
+        </article>
+      </section>
+
+      <footer>Review AI-generated text before sending. Do not include passwords or sensitive personal information.</footer>
+    </main>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

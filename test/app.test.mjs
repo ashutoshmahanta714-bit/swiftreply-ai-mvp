@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import test from 'node:test';
-import { NVIDIA_CHAT_URL, extractOutputText } from '../src/nvidia.mjs';
+import { extractOutputText, geminiGenerateUrl } from '../src/gemini.mjs';
 import { createServer } from '../src/server.mjs';
 
-test('extractOutputText reads NVIDIA chat completion output', () => {
+test('extractOutputText reads Gemini generated content', () => {
   const value = extractOutputText({
-    choices: [{ message: { content: 'A polished reply.' } }],
+    candidates: [{ content: { parts: [{ text: 'A polished reply.' }] } }],
   });
   assert.equal(value, 'A polished reply.');
 });
@@ -21,14 +21,15 @@ async function withServer(run) {
     capturedBody = JSON.parse(options.body);
     return new Response(JSON.stringify({
       model: 'test-model',
-      choices: [{ message: { content: 'Hello! How may I help?' } }],
+      candidates: [{ content: { parts: [{ text: 'Hello! How may I help?' }] } }],
+      modelVersion: 'test-model',
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   };
   const server = createServer({
     env: {
       NODE_ENV: 'production',
-      NVIDIA_API_KEY: 'test-key',
-      NVIDIA_MODEL: 'test-model',
+      GEMINI_API_KEY: 'test-key',
+      GEMINI_MODEL: 'test-model',
       APP_PASSWORD: 'test-password',
       RATE_LIMIT_MAX: '10',
     },
@@ -72,7 +73,7 @@ test('generate endpoint requires the app password', async () => {
   });
 });
 
-test('generate endpoint calls NVIDIA with safe production options', async () => {
+test('generate endpoint calls Gemini with safe production options', async () => {
   await withServer(async (baseUrl, getCapturedRequest) => {
     const response = await fetch(`${baseUrl}/api/generate`, {
       method: 'POST',
@@ -87,11 +88,10 @@ test('generate endpoint calls NVIDIA with safe production options', async () => 
 
     const request = getCapturedRequest();
     const requestBody = request.body;
-    assert.equal(request.url, NVIDIA_CHAT_URL);
-    assert.equal(request.headers.Authorization, 'Bearer test-key');
-    assert.equal(requestBody.model, 'test-model');
-    assert.equal(requestBody.messages[1].content, 'Please reply to this.');
-    assert.match(requestBody.messages[0].content, /friendly tone/);
-    assert.equal(requestBody.stream, false);
+    assert.equal(request.url, geminiGenerateUrl('test-model'));
+    assert.equal(request.headers['x-goog-api-key'], 'test-key');
+    assert.equal(requestBody.contents[0].parts[0].text, 'Please reply to this.');
+    assert.match(requestBody.systemInstruction.parts[0].text, /friendly tone/);
+    assert.equal(requestBody.generationConfig.maxOutputTokens, 400);
   });
 });

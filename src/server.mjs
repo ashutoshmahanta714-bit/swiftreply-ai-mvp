@@ -4,7 +4,7 @@ import { createServer as createHttpServer } from 'node:http';
 import { timingSafeEqual } from 'node:crypto';
 import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_MODEL, generateReply } from './nvidia.mjs';
+import { DEFAULT_MODEL, generateReply } from './gemini.mjs';
 
 const ROOT_DIR = fileURLToPath(new URL('..', import.meta.url));
 const PUBLIC_DIR = join(ROOT_DIR, 'public');
@@ -119,9 +119,9 @@ async function serveStatic(pathname, response) {
 }
 
 export function createServer({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
-  const apiKey = env.NVIDIA_API_KEY || '';
+  const apiKey = env.GEMINI_API_KEY || '';
   const appPassword = env.APP_PASSWORD || '';
-  const model = env.NVIDIA_MODEL || DEFAULT_MODEL;
+  const model = env.GEMINI_MODEL || DEFAULT_MODEL;
   const isProduction = env.NODE_ENV === 'production';
   const maxRequests = Math.max(1, Number.parseInt(env.RATE_LIMIT_MAX || '10', 10));
   const windowMs = Math.max(60_000, Number.parseInt(env.RATE_LIMIT_WINDOW_MS || '3600000', 10));
@@ -142,7 +142,7 @@ export function createServer({ env = process.env, fetchImpl = globalThis.fetch }
 
       if (request.method === 'POST' && url.pathname === '/api/generate') {
         if (!apiKey) {
-          sendJson(response, 503, { error: 'The server is missing NVIDIA_API_KEY.' });
+          sendJson(response, 503, { error: 'The server is missing GEMINI_API_KEY.' });
           return;
         }
 

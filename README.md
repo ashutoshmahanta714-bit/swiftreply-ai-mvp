@@ -1,12 +1,12 @@
 # SwiftReply AI MVP
 
-A repaired, deployable MVP for generating polished email, chat, and customer-support replies with the NVIDIA NIM API.
+A repaired, deployable MVP for generating polished email, chat, and customer-support replies with the Gemini API.
 
 ## What works
 
 - Responsive browser interface
 - Professional, friendly, concise, and empathetic tones
-- Server-side NVIDIA API key protection
+- Server-side Gemini API key protection
 - Password-protected generation endpoint
 - Per-IP request limiting
 - Health check and Docker deployment
@@ -30,16 +30,16 @@ Open `http://localhost:3000`.
 
 ## Required production secrets
 
-- `NVIDIA_API_KEY`
+- `GEMINI_API_KEY`
 - `APP_PASSWORD`
 
 Optional configuration:
 
-- `NVIDIA_MODEL` (defaults to `nvidia/llama-3.3-nemotron-super-49b-v1.5`)
+- `GEMINI_MODEL` (defaults to `gemini-2.5-flash-lite`)
 - `RATE_LIMIT_MAX` (defaults to `10` requests per hour per IP)
 - `RATE_LIMIT_WINDOW_MS` (defaults to one hour)
 
-Never commit `.env` or expose `NVIDIA_API_KEY` in browser code.
+Never commit `.env` or expose `GEMINI_API_KEY` in browser code.
 
 ## Test
 

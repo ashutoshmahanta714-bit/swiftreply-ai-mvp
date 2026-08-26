@@ -1,12 +1,12 @@
 # SwiftReply AI MVP
 
-A repaired, deployable MVP for generating polished email, chat, and customer-support replies with the OpenAI Responses API.
+A repaired, deployable MVP for generating polished email, chat, and customer-support replies with the NVIDIA NIM API.
 
 ## What works
 
 - Responsive browser interface
 - Professional, friendly, concise, and empathetic tones
-- Server-side OpenAI API key protection
+- Server-side NVIDIA API key protection
 - Password-protected generation endpoint
 - Per-IP request limiting
 - Health check and Docker deployment
@@ -30,16 +30,16 @@ Open `http://localhost:3000`.
 
 ## Required production secrets
 
-- `OPENAI_API_KEY`
+- `NVIDIA_API_KEY`
 - `APP_PASSWORD`
 
 Optional configuration:
 
-- `OPENAI_MODEL` (defaults to `gpt-5.6-luna`)
+- `NVIDIA_MODEL` (defaults to `meta/llama-3.3-70b-instruct`)
 - `RATE_LIMIT_MAX` (defaults to `10` requests per hour per IP)
 - `RATE_LIMIT_WINDOW_MS` (defaults to one hour)
 
-Never commit `.env` or expose `OPENAI_API_KEY` in browser code.
+Never commit `.env` or expose `NVIDIA_API_KEY` in browser code.
 
 ## Test
 

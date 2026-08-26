@@ -1,33 +1,34 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import test from 'node:test';
-import { extractOutputText } from '../src/openai.mjs';
+import { NVIDIA_CHAT_URL, extractOutputText } from '../src/nvidia.mjs';
 import { createServer } from '../src/server.mjs';
 
-test('extractOutputText reads Responses API message output', () => {
+test('extractOutputText reads NVIDIA chat completion output', () => {
   const value = extractOutputText({
-    output: [{
-      type: 'message',
-      content: [{ type: 'output_text', text: 'A polished reply.' }],
-    }],
+    choices: [{ message: { content: 'A polished reply.' } }],
   });
   assert.equal(value, 'A polished reply.');
 });
 
 async function withServer(run) {
   let capturedBody;
-  const fetchImpl = async (_url, options) => {
+  let capturedUrl;
+  let capturedHeaders;
+  const fetchImpl = async (url, options) => {
+    capturedUrl = url;
+    capturedHeaders = options.headers;
     capturedBody = JSON.parse(options.body);
     return new Response(JSON.stringify({
       model: 'test-model',
-      output: [{ type: 'message', content: [{ type: 'output_text', text: 'Hello! How may I help?' }] }],
+      choices: [{ message: { content: 'Hello! How may I help?' } }],
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   };
   const server = createServer({
     env: {
       NODE_ENV: 'production',
-      OPENAI_API_KEY: 'test-key',
-      OPENAI_MODEL: 'test-model',
+      NVIDIA_API_KEY: 'test-key',
+      NVIDIA_MODEL: 'test-model',
       APP_PASSWORD: 'test-password',
       RATE_LIMIT_MAX: '10',
     },
@@ -37,7 +38,11 @@ async function withServer(run) {
   await once(server, 'listening');
   const { port } = server.address();
   try {
-    await run(`http://127.0.0.1:${port}`, () => capturedBody);
+    await run(`http://127.0.0.1:${port}`, () => ({
+      body: capturedBody,
+      url: capturedUrl,
+      headers: capturedHeaders,
+    }));
   } finally {
     server.close();
     await once(server, 'close');
@@ -67,8 +72,8 @@ test('generate endpoint requires the app password', async () => {
   });
 });
 
-test('generate endpoint calls OpenAI with safe production options', async () => {
-  await withServer(async (baseUrl, getCapturedBody) => {
+test('generate endpoint calls NVIDIA with safe production options', async () => {
+  await withServer(async (baseUrl, getCapturedRequest) => {
     const response = await fetch(`${baseUrl}/api/generate`, {
       method: 'POST',
       headers: {
@@ -80,10 +85,13 @@ test('generate endpoint calls OpenAI with safe production options', async () => 
     assert.equal(response.status, 200);
     assert.equal((await response.json()).reply, 'Hello! How may I help?');
 
-    const requestBody = getCapturedBody();
+    const request = getCapturedRequest();
+    const requestBody = request.body;
+    assert.equal(request.url, NVIDIA_CHAT_URL);
+    assert.equal(request.headers.Authorization, 'Bearer test-key');
     assert.equal(requestBody.model, 'test-model');
-    assert.equal(requestBody.input, 'Please reply to this.');
-    assert.equal(requestBody.store, false);
-    assert.match(requestBody.instructions, /friendly tone/);
+    assert.equal(requestBody.messages[1].content, 'Please reply to this.');
+    assert.match(requestBody.messages[0].content, /friendly tone/);
+    assert.equal(requestBody.stream, false);
   });
 });

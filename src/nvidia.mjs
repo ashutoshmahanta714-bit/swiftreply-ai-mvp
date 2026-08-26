@@ -1,23 +1,9 @@
-const OPENAI_RESPONSES_URL = 'https://api.openai.com/v1/responses';
-
-export const DEFAULT_MODEL = 'gpt-5.6-luna';
+export const NVIDIA_CHAT_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
+export const DEFAULT_MODEL = 'meta/llama-3.3-70b-instruct';
 
 export function extractOutputText(payload) {
-  if (typeof payload?.output_text === 'string' && payload.output_text.trim()) {
-    return payload.output_text.trim();
-  }
-
-  const textParts = [];
-  for (const item of payload?.output ?? []) {
-    if (item?.type !== 'message') continue;
-    for (const content of item.content ?? []) {
-      if (content?.type === 'output_text' && typeof content.text === 'string') {
-        textParts.push(content.text);
-      }
-    }
-  }
-
-  return textParts.join('\n').trim();
+  const content = payload?.choices?.[0]?.message?.content;
+  return typeof content === 'string' ? content.trim() : '';
 }
 
 export async function generateReply({
@@ -36,25 +22,30 @@ export async function generateReply({
     'Keep the reply clear, natural, and concise unless the message requires detail.',
   ].join(' ');
 
-  const response = await fetchImpl(OPENAI_RESPONSES_URL, {
+  const response = await fetchImpl(NVIDIA_CHAT_URL, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
     body: JSON.stringify({
       model,
-      instructions,
-      input: message,
-      max_output_tokens: 400,
-      store: false,
+      messages: [
+        { role: 'system', content: instructions },
+        { role: 'user', content: message },
+      ],
+      temperature: 0.2,
+      top_p: 0.7,
+      max_tokens: 400,
+      stream: false,
     }),
     signal,
   });
 
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const detail = payload?.error?.message || `OpenAI request failed (${response.status})`;
+    const detail = payload?.error?.message || `NVIDIA request failed (${response.status})`;
     const error = new Error(detail);
     error.statusCode = response.status;
     throw error;
@@ -62,7 +53,7 @@ export async function generateReply({
 
   const reply = extractOutputText(payload);
   if (!reply) {
-    throw new Error('OpenAI returned an empty reply.');
+    throw new Error('NVIDIA returned an empty reply.');
   }
 
   return { reply, model: payload.model || model };

@@ -10,7 +10,7 @@ services:
       - key: APP_PASSWORD
         sync: false
       - key: GEMINI_MODEL
-        value: gemini-2.5-flash-lite
+        value: gemini-3.5-flash-lite
       - key: RATE_LIMIT_MAX
         value: "10"
       - key: RATE_LIMIT_WINDOW_MS

@@ -35,7 +35,7 @@ Open `http://localhost:3000`.
 
 Optional configuration:
 
-- `GEMINI_MODEL` (defaults to `gemini-2.5-flash-lite`)
+- `GEMINI_MODEL` (defaults to `gemini-3.5-flash-lite`)
 - `RATE_LIMIT_MAX` (defaults to `10` requests per hour per IP)
 - `RATE_LIMIT_WINDOW_MS` (defaults to one hour)
 

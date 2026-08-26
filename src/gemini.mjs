@@ -1,4 +1,4 @@
-export const DEFAULT_MODEL = 'gemini-2.5-flash-lite';
+export const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
 
 export function geminiGenerateUrl(model = DEFAULT_MODEL) {
   return `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;

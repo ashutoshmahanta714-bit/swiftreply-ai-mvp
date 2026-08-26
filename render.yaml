@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: swiftreply-ai-mvp
+    runtime: docker
+    healthCheckPath: /api/health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: APP_PASSWORD
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-5.6-luna
+      - key: RATE_LIMIT_MAX
+        value: "10"
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "3600000"

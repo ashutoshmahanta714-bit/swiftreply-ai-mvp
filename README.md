@@ -35,7 +35,7 @@ Open `http://localhost:3000`.
 
 Optional configuration:
 
-- `NVIDIA_MODEL` (defaults to `meta/llama-3.3-70b-instruct`)
+- `NVIDIA_MODEL` (defaults to `nvidia/llama-3.3-nemotron-super-49b-v1.5`)
 - `RATE_LIMIT_MAX` (defaults to `10` requests per hour per IP)
 - `RATE_LIMIT_WINDOW_MS` (defaults to one hour)
 

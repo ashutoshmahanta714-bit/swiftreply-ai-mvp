@@ -10,7 +10,7 @@ services:
       - key: APP_PASSWORD
         sync: false
       - key: NVIDIA_MODEL
-        value: meta/llama-3.3-70b-instruct
+        value: nvidia/llama-3.3-nemotron-super-49b-v1.5
       - key: RATE_LIMIT_MAX
         value: "10"
       - key: RATE_LIMIT_WINDOW_MS

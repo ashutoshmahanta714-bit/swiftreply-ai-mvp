@@ -1,5 +1,5 @@
 export const NVIDIA_CHAT_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
-export const DEFAULT_MODEL = 'meta/llama-3.3-70b-instruct';
+export const DEFAULT_MODEL = 'nvidia/llama-3.3-nemotron-super-49b-v1.5';
 
 export function extractOutputText(payload) {
   const content = payload?.choices?.[0]?.message?.content;
@@ -45,7 +45,9 @@ export async function generateReply({
 
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const detail = payload?.error?.message || `NVIDIA request failed (${response.status})`;
+    const detail = response.status === 410
+      ? 'The selected NVIDIA model endpoint is unavailable. Please try again after the deployment model is updated.'
+      : (payload?.error?.message || payload?.detail || `NVIDIA request failed (${response.status})`);
     const error = new Error(detail);
     error.statusCode = response.status;
     throw error;
